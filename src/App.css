@@ -188,3 +188,211 @@
   background: oklch(0.60 0.06 130);
 }
 
+/* Mobile App Shell Styles */
+.mobile-app-shell {
+  /* Mobile viewport setup */
+  min-height: 100vh;
+  min-height: 100dvh; /* Dynamic viewport height for mobile */
+  position: relative;
+  overflow: hidden;
+}
+
+.mobile-app-container {
+  /* Full mobile container */
+  width: 100%;
+  max-width: 430px; /* iPhone 14 Pro Max width */
+  min-height: 100vh;
+  min-height: 100dvh;
+  margin: 0 auto;
+  position: relative;
+  background: oklch(0.96 0.01 85);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  
+  /* Safe area padding for mobile devices */
+  padding-top: env(safe-area-inset-top, 0);
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  padding-left: env(safe-area-inset-left, 0);
+  padding-right: env(safe-area-inset-right, 0);
+}
+
+.mobile-app-content {
+  /* Main content area */
+  width: 100%;
+  min-height: calc(100vh - env(safe-area-inset-top, 0) - env(safe-area-inset-bottom, 0));
+  min-height: calc(100dvh - env(safe-area-inset-top, 0) - env(safe-area-inset-bottom, 0));
+  position: relative;
+  z-index: 1;
+}
+
+/* Mobile Chat Overlay */
+.mobile-chat-overlay {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 430px;
+  height: 100vh;
+  height: 100dvh;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);
+  z-index: 1000;
+  
+  /* Safe area padding */
+  padding-top: env(safe-area-inset-top, 0);
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  padding-left: env(safe-area-inset-left, 0);
+  padding-right: env(safe-area-inset-right, 0);
+}
+
+/* Mobile-optimized touch targets */
+@media (hover: none) and (pointer: coarse) {
+  /* Touch device optimizations */
+  button, .button, [role="button"] {
+    min-height: 44px; /* Minimum touch target size */
+    min-width: 44px;
+  }
+  
+  /* Larger tap areas for small elements */
+  .tap-area {
+    padding: 8px;
+  }
+}
+
+/* Mobile typography scaling */
+@media screen and (max-width: 430px) {
+  html {
+    font-size: 16px; /* Base font size for mobile */
+  }
+  
+  /* Adjust heading sizes for mobile */
+  h1 { font-size: 1.5rem; }
+  h2 { font-size: 1.25rem; }
+  h3 { font-size: 1.125rem; }
+  h4 { font-size: 1rem; }
+  
+  /* Mobile-specific spacing */
+  .mobile-padding {
+    padding: 1rem;
+  }
+  
+  .mobile-margin {
+    margin: 0.75rem;
+  }
+}
+
+/* Prevent zoom on inputs on iOS Safari */
+@media screen and (max-width: 430px) {
+  input, textarea, select {
+    font-size: 16px !important;
+  }
+}
+
+/* Mobile-specific animations */
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-slide-in-up {
+  animation: slideInUp 0.4s ease-out forwards;
+}
+
+.animate-slide-in-left {
+  animation: slideInLeft 0.4s ease-out forwards;
+}
+
+/* Mobile-specific card styles */
+.mobile-card {
+  margin: 0.75rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Status bar style (for PWA) */
+.status-bar-overlay {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 430px;
+  height: env(safe-area-inset-top, 0);
+  background: oklch(0.96 0.01 85);
+  z-index: 999;
+}
+
+/* Bottom safe area */
+.bottom-safe-area {
+  height: env(safe-area-inset-bottom, 0);
+  background: oklch(0.96 0.01 85);
+}
+
+/* Mobile-specific utilities */
+.mobile-only {
+  display: block;
+}
+
+.desktop-only {
+  display: none;
+}
+
+@media screen and (min-width: 431px) {
+  .mobile-only {
+    display: none;
+  }
+  
+  .desktop-only {
+    display: block;
+  }
+}
+
+/* Improved mobile scrolling */
+.mobile-scroll {
+  -webkit-overflow-scrolling: touch;
+  overflow-scrolling: touch;
+}
+
+/* Mobile-friendly focus styles */
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid oklch(0.55 0.08 130);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+/* Hide scrollbar on mobile but keep functionality */
+@media screen and (max-width: 430px) {
+  .hide-scrollbar {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* Internet Explorer 10+ */
+  }
+  
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none; /* WebKit */
+  }
+}
+

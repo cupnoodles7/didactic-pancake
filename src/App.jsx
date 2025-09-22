@@ -99,44 +99,51 @@ function App() {
   };
 
   return (
-    <div className="App">
-      {currentView === 'onboarding' && (
-        <OnboardingFlow onComplete={handleOnboardingComplete} />
-      )}
-      
-      {currentView === 'dashboard' && childData && (
-        <MobileDashboard 
-          childData={childData}
-          onStartActivity={handleStartActivity}
-          onOpenChat={handleOpenChat}
-        />
-      )}
-      
-      {currentView === 'activity' && childData && (
-        <ActivityView 
-          activity={childData.todayActivity}
-          onComplete={handleCompleteActivity}
-          onBack={handleBackToDashboard}
-        />
-      )}
+    <div className="App mobile-app-shell">
+      {/* Mobile App Container */}
+      <div className="mobile-app-container">
+        <div className="mobile-app-content">
+          {currentView === 'onboarding' && (
+            <OnboardingFlow onComplete={handleOnboardingComplete} />
+          )}
+          
+          {currentView === 'dashboard' && childData && (
+            <MobileDashboard 
+              childData={childData}
+              onStartActivity={handleStartActivity}
+              onOpenChat={handleOpenChat}
+            />
+          )}
+          
+          {currentView === 'activity' && childData && (
+            <ActivityView 
+              activity={childData.todayActivity}
+              onComplete={handleCompleteActivity}
+              onBack={handleBackToDashboard}
+            />
+          )}
+        </div>
 
-      {/* Floating character only shows on dashboard and activity views */}
-      {(currentView === 'dashboard' || currentView === 'activity') && (
-        <FloatingCharacter 
-          position="bottom-right"
-          size="sm"
-          autoAnimate={true}
-        />
-      )}
+        {/* Floating character only shows on dashboard and activity views */}
+        {(currentView === 'dashboard' || currentView === 'activity') && (
+          <FloatingCharacter 
+            position="bottom-right"
+            size="sm"
+            autoAnimate={true}
+          />
+        )}
 
-      {/* ChatBot */}
-      {isChatOpen && childData && (
-        <ChatBot 
-          isOpen={isChatOpen}
-          onClose={handleCloseChat}
-          childData={childData}
-        />
-      )}
+        {/* ChatBot Overlay */}
+        {isChatOpen && childData && (
+          <div className="mobile-chat-overlay">
+            <ChatBot 
+              isOpen={isChatOpen}
+              onClose={handleCloseChat}
+              childData={childData}
+            />
+          </div>
+        )}
+      </div>
     </div>
   );
 }
