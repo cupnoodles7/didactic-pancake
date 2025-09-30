@@ -8,6 +8,10 @@
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Accessibility](https://img.shields.io/badge/Accessibility-WCAG%202.1-green)](https://www.w3.org/WAI/WCAG21/quickref/)
 
+## 🚀 **Quick Deploy**
+
+[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/cupnoodles7/didactic-pancake)
+
 ## 🚀 **Mission Statement**
 
 Little Steps bridges the digital divide in early childhood development by providing comprehensive, culturally-sensitive, and accessible learning resources to families across all socio-economic backgrounds. From AI-powered assessments to offline SMS support, we ensure every child gets the best start in life.
@@ -106,6 +110,29 @@ npm run build
 # Preview production build
 npm run preview
 ```
+
+### **Deploy to Netlify**
+
+#### **Option 1: One-Click Deploy**
+Click the "Deploy to Netlify" button above for instant deployment!
+
+#### **Option 2: Manual Deployment**
+1. Fork this repository to your GitHub account
+2. Go to [Netlify](https://netlify.com) and sign in
+3. Click "New site from Git" → Select GitHub → Choose your forked repository
+4. Build settings will be auto-detected from `netlify.toml`:
+   - **Build command**: `npm run build`
+   - **Publish directory**: `dist`
+   - **Node version**: 18
+5. Click "Deploy site"
+
+#### **Features Included in Deployment**
+- ✅ **Single Page Application** routing with fallback
+- ✅ **Security headers** (HTTPS, XSS protection, CSP)
+- ✅ **Asset optimization** and caching
+- ✅ **PWA support** with manifest handling
+- ✅ **Preview deployments** for pull requests
+- ✅ **Auto-deploy** on every push to main branch
 
 ---
 

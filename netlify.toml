@@ -1,0 +1,75 @@
+[build]
+  # Build command
+  command = "npm run build"
+  # Directory to publish
+  publish = "dist"
+  # Node.js version
+  environment = { NODE_VERSION = "18" }
+
+[build.environment]
+  # Enable CI environment
+  CI = "true"
+  # Disable telemetry for faster builds
+  DISABLE_TELEMETRY = "true"
+
+# SPA redirect rules for client-side routing
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Security headers
+[[headers]]
+  for = "/*"
+  [headers.values]
+    # Enable HTTPS
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains"
+    # Prevent clickjacking
+    X-Frame-Options = "DENY"
+    # Prevent MIME type sniffing
+    X-Content-Type-Options = "nosniff"
+    # Enable XSS protection
+    X-XSS-Protection = "1; mode=block"
+    # Content Security Policy
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https:; media-src 'self' data:;"
+
+# Cache static assets
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Cache fonts
+[[headers]]
+  for = "/*.woff2"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# PWA manifest
+[[headers]]
+  for = "/manifest.json"
+  [headers.values]
+    Content-Type = "application/manifest+json"
+
+# Optimize images
+[build.processing]
+  skip_processing = false
+
+[build.processing.images]
+  compress = true
+
+# Enable forms for contact/feedback (if needed later)
+[build.processing.html]
+  pretty_urls = true
+
+# Environment variables (add your production values)
+[context.production.environment]
+  NODE_ENV = "production"
+  VITE_APP_TITLE = "Little Steps - Early Childhood Development"
+  VITE_APP_DESCRIPTION = "Empowering every family's journey in early childhood development"
+
+[context.deploy-preview.environment]
+  NODE_ENV = "preview"
+
+[context.branch-deploy.environment]
+  NODE_ENV = "development"
