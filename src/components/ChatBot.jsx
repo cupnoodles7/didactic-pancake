@@ -2,8 +2,9 @@ import { useState, useRef, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { MessageCircle, Send, X, Mic, MicOff } from 'lucide-react';
+import { MessageCircle, Send, X, Mic, MicOff, Volume2 } from 'lucide-react';
 import AnimatedCharacter from './AnimatedCharacter';
+import { useSpeech } from '@/hooks/useSpeech';
 
 const ChatBot = ({ isOpen, onClose, childData }) => {
   const [messages, setMessages] = useState([
@@ -18,6 +19,9 @@ const ChatBot = ({ isOpen, onClose, childData }) => {
   const [isListening, setIsListening] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef(null);
+  
+  // Speech functionality
+  const { isSupported, speak } = useSpeech();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -165,12 +169,26 @@ const ChatBot = ({ isOpen, onClose, childData }) => {
                       : 'bg-sage-50 text-sage-800 border border-sage-200'
                   }`}
                 >
-                  <p className="text-sm">{message.content}</p>
-                  <p className={`text-xs mt-1 ${
-                    message.type === 'user' ? 'text-sage-200' : 'text-sage-500'
-                  }`}>
-                    {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  </p>
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1">
+                      <p className="text-sm">{message.content}</p>
+                      <p className={`text-xs mt-1 ${
+                        message.type === 'user' ? 'text-sage-200' : 'text-sage-500'
+                      }`}>
+                        {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </p>
+                    </div>
+                    {message.type === 'bot' && isSupported && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => speak(message.content)}
+                        className="flex-shrink-0 h-6 w-6 p-0 text-sage-600 hover:bg-sage-100/50 rounded-full"
+                      >
+                        <Volume2 className="h-3 w-3" />
+                      </Button>
+                    )}
+                  </div>
                 </div>
               </div>
             ))}

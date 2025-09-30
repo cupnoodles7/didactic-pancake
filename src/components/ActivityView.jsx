@@ -3,8 +3,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { CheckCircle, Clock, ArrowLeft, Volume2, Lightbulb, Info } from 'lucide-react';
+import { CheckCircle, Clock, ArrowLeft, Volume2, VolumeX, Pause, Play, Lightbulb, Info } from 'lucide-react';
 import AnimatedCharacter from './AnimatedCharacter';
+import { useSpeech } from '@/hooks/useSpeech';
 
 const ActivityView = ({ activity, onComplete, onBack }) => {
   const [currentStep, setCurrentStep] = useState(0);
@@ -12,6 +13,9 @@ const ActivityView = ({ activity, onComplete, onBack }) => {
   const [characterAnimation, setCharacterAnimation] = useState('guiding');
   const [isCompleted, setIsCompleted] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
+  
+  // Speech functionality
+  const { isSupported, isSpeaking, isPaused, speak, stop, toggle } = useSpeech();
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -47,6 +51,25 @@ const ActivityView = ({ activity, onComplete, onBack }) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  // Speech functions
+  const readCurrentStep = () => {
+    if (!activity.steps[currentStep]) return;
+    
+    const step = activity.steps[currentStep];
+    const textToRead = `Step ${currentStep + 1}. ${step.title}. ${step.description}. ${step.instruction}`;
+    
+    if (isSpeaking) {
+      stop();
+    } else {
+      speak(textToRead);
+    }
+  };
+
+  const readActivityTitle = () => {
+    const textToRead = `${activity.title}. ${activity.description}. This activity is for ${activity.ageRange} and takes about ${activity.duration}.`;
+    speak(textToRead);
   };
 
   if (isCompleted) {
@@ -254,10 +277,33 @@ const ActivityView = ({ activity, onComplete, onBack }) => {
           <Button 
             variant="outline" 
             size="lg"
-            className="w-full border-sage-300 text-sage-700 hover:bg-sage-50 hover:border-sage-400 rounded-2xl py-3 font-semibold min-h-[48px]"
+            onClick={readCurrentStep}
+            disabled={!isSupported}
+            className={`w-full border-sage-300 text-sage-700 hover:bg-sage-50 hover:border-sage-400 rounded-2xl py-3 font-semibold min-h-[48px] ${
+              isSpeaking ? 'bg-sage-100 border-sage-400' : ''
+            } ${!isSupported ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
-            <Volume2 className="h-4 w-4 mr-2" />
-            Read Aloud
+            {!isSupported ? (
+              <>
+                <VolumeX className="h-4 w-4 mr-2" />
+                Not Supported
+              </>
+            ) : isSpeaking && !isPaused ? (
+              <>
+                <Pause className="h-4 w-4 mr-2" />
+                Pause Reading
+              </>
+            ) : isPaused ? (
+              <>
+                <Play className="h-4 w-4 mr-2" />
+                Resume Reading
+              </>
+            ) : (
+              <>
+                <Volume2 className="h-4 w-4 mr-2" />
+                Read Aloud
+              </>
+            )}
           </Button>
         </div>
         <div className="bottom-safe-area" />
@@ -295,6 +341,18 @@ const ActivityView = ({ activity, onComplete, onBack }) => {
                   <p className="text-sm text-sage-700">{activity.duration}</p>
                 </div>
               </div>
+              
+              {/* Read Activity Info Button */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={readActivityTitle}
+                disabled={!isSupported}
+                className="w-full border-sage-300 text-sage-700 hover:bg-sage-50 hover:border-sage-400 rounded-2xl py-2 font-medium"
+              >
+                <Volume2 className="h-4 w-4 mr-2" />
+                Read Activity Info
+              </Button>
             </CardContent>
           </Card>
         </div>

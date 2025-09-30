@@ -1,12 +1,13 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
-import { ArrowRight, ArrowLeft, Baby, Clock, Globe } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Baby, Clock, Globe, Volume2 } from 'lucide-react';
 import AnimatedCharacter from './AnimatedCharacter';
+import { useSpeech } from '@/hooks/useSpeech';
 
 const OnboardingFlow = ({ onComplete }) => {
   const [currentStep, setCurrentStep] = useState(0);
@@ -19,8 +20,29 @@ const OnboardingFlow = ({ onComplete }) => {
     availability: [],
     notifications: true,
     multipleCaregiver: false,
-    caregiverEmails: []
+    caregiverEmails: [],
+    governmentSchemes: false,
+    annualIncome: '',
+    caste: '',
+    rationCardType: '',
+    district: '',
+    schoolEnrolled: false,
+    pregnancyStatus: false,
+    nutritionConcerns: false,
+    healthConcerns: false,
+    offlineAccess: false,
+    phoneNumber: '',
+    offlineMethod: '',
+    smsPreferences: {
+      dailyActivity: true,
+      weeklyProgress: true,
+      governmentSchemes: false,
+      healthAlerts: true
+    }
   });
+
+  // Speech functionality
+  const { isSupported, speak } = useSpeech();
 
   const steps = [
     {
@@ -44,6 +66,16 @@ const OnboardingFlow = ({ onComplete }) => {
       component: CaregiversStep
     },
     {
+      title: "Government Schemes 🏛️",
+      description: "Get personalized recommendations for government benefits",
+      component: GovernmentSchemesStep
+    },
+    {
+      title: "Offline Access 📶",
+      description: "Stay connected even with poor internet via SMS/Voice",
+      component: OfflineAccessStep
+    },
+    {
       title: "You're all set! 🎉",
       description: "Let's start your child's development journey",
       component: CompletionStep
@@ -65,6 +97,10 @@ const OnboardingFlow = ({ onComplete }) => {
       case 3:
         return true; // Caregivers step is optional
       case 4:
+        return true; // Government schemes step is optional
+      case 5:
+        return true; // Offline access step is optional
+      case 6:
         return true; // Completion step
       default:
         return false;
@@ -98,13 +134,39 @@ const OnboardingFlow = ({ onComplete }) => {
     return 'Concrete Operational (7+ years)';
   };
 
+  // Speech function for current step
+  const readCurrentStep = () => {
+    const currentStepData = steps[currentStep];
+    const textToRead = `${currentStepData.title}. ${currentStepData.description}`;
+    speak(textToRead);
+  };
+
+  // Auto-read when step changes (optional - can be enabled/disabled)
+  useEffect(() => {
+    if (isSupported && currentStep === 0) {
+      // Only auto-read the welcome step
+      setTimeout(() => {
+        readCurrentStep();
+      }, 1000);
+    }
+  }, [currentStep, isSupported]);
+
   const CurrentStepComponent = steps[currentStep].component;
 
   return (
     <div className="mobile-onboarding min-h-screen bg-gradient-to-br from-sage-50 to-beige-50 flex items-center justify-center p-4">
       <div className="status-bar-overlay" />
       
-      <div className="w-full max-w-sm">
+      {/* Prototype Banner */}
+      <div className="fixed top-0 left-0 right-0 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-center py-2 px-4 z-50 shadow-lg">
+        <div className="text-xs font-semibold flex items-center justify-center gap-2">
+          <span className="animate-pulse">🚀</span>
+          PROTOTYPE MODE - Experience starts fresh each time
+          <span className="animate-pulse">🚀</span>
+        </div>
+      </div>
+      
+      <div className="w-full max-w-sm mt-12">
         {/* Progress indicator - Mobile optimized */}
         <div className="mb-6">
           <div className="flex justify-between items-center mb-3">
@@ -136,6 +198,21 @@ const OnboardingFlow = ({ onComplete }) => {
             <CardDescription className="text-sage-600 mt-2 leading-relaxed">
               {steps[currentStep].description}
             </CardDescription>
+            
+            {/* Read Aloud Button */}
+            {isSupported && (
+              <div className="flex justify-center mt-3">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={readCurrentStep}
+                  className="text-sage-600 hover:bg-sage-100/50 rounded-full px-3 py-1"
+                >
+                  <Volume2 className="h-3 w-3 mr-1" />
+                  <span className="text-xs">Read to me</span>
+                </Button>
+              </div>
+            )}
           </CardHeader>
           <CardContent className="p-6">
             <CurrentStepComponent 
@@ -367,6 +444,328 @@ const CaregiversStep = ({ formData, updateFormData }) => (
     <div className="bg-gradient-to-br from-warm-50 to-sage-50 p-4 rounded-2xl border border-sage-100">
       <p className="text-sm text-sage-700">
         💡 <strong>Tip:</strong> Multiple caregivers can help ensure consistency in your child's development activities.
+      </p>
+    </div>
+  </div>
+);
+
+const GovernmentSchemesStep = ({ formData, updateFormData }) => (
+  <div className="space-y-6">
+    <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-2xl border border-blue-100">
+      <div className="flex items-center gap-3 mb-3">
+        <div className="text-3xl">🏛️</div>
+        <div>
+          <h3 className="font-bold text-blue-900">Government Benefits & Schemes</h3>
+          <p className="text-blue-700 text-sm">Get personalized recommendations for nutrition, education & health programs</p>
+        </div>
+      </div>
+    </div>
+
+    <div className="flex items-start gap-4 p-4 bg-gradient-to-br from-sage-50 to-warm-50 rounded-2xl border border-sage-100">
+      <Checkbox
+        id="governmentSchemes"
+        checked={formData.governmentSchemes}
+        onCheckedChange={(checked) => updateFormData({ governmentSchemes: checked })}
+        className="border-sage-300 h-5 w-5 mt-1"
+      />
+      <div className="flex-1">
+        <Label htmlFor="governmentSchemes" className="text-sage-700 cursor-pointer font-medium block mb-2">
+          🎯 Yes, help me discover government schemes and benefits
+        </Label>
+        <p className="text-sm text-sage-600">
+          We'll analyze your family's profile to recommend relevant government programs for nutrition, education, healthcare, and child development support.
+        </p>
+      </div>
+    </div>
+
+    {formData.governmentSchemes && (
+      <div className="space-y-4 bg-white p-6 rounded-2xl border border-gray-200">
+        <h4 className="font-semibold text-gray-900 mb-4">Help us find the best schemes for you:</h4>
+        
+        <div className="grid gap-4">
+          <div>
+            <Label className="text-gray-700 font-medium mb-2 block">Annual Household Income (₹)</Label>
+            <Select onValueChange={(value) => updateFormData({ annualIncome: parseInt(value) })}>
+              <SelectTrigger className="border-gray-300 focus:ring-blue-500 h-12 rounded-2xl">
+                <SelectValue placeholder="Select income range" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="200000">Below ₹2 Lakhs</SelectItem>
+                <SelectItem value="500000">₹2-5 Lakhs</SelectItem>
+                <SelectItem value="800000">₹5-8 Lakhs</SelectItem>
+                <SelectItem value="1200000">₹8-12 Lakhs</SelectItem>
+                <SelectItem value="1500000">Above ₹12 Lakhs</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label className="text-gray-700 font-medium mb-2 block">Category</Label>
+              <Select onValueChange={(value) => updateFormData({ caste: value })}>
+                <SelectTrigger className="border-gray-300 focus:ring-blue-500 h-12 rounded-2xl">
+                  <SelectValue placeholder="Select category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="General">General</SelectItem>
+                  <SelectItem value="SC">SC</SelectItem>
+                  <SelectItem value="ST">ST</SelectItem>
+                  <SelectItem value="OBC">OBC</SelectItem>
+                  <SelectItem value="EWS">EWS</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label className="text-gray-700 font-medium mb-2 block">Ration Card Type</Label>
+              <Select onValueChange={(value) => updateFormData({ rationCardType: value })}>
+                <SelectTrigger className="border-gray-300 focus:ring-blue-500 h-12 rounded-2xl">
+                  <SelectValue placeholder="Card type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="BPL">BPL (Below Poverty Line)</SelectItem>
+                  <SelectItem value="APL">APL (Above Poverty Line)</SelectItem>
+                  <SelectItem value="AAY">AAY (Antyodaya Anna Yojana)</SelectItem>
+                  <SelectItem value="None">No Ration Card</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div>
+            <Label className="text-gray-700 font-medium mb-2 block">District/City</Label>
+            <Input
+              placeholder="Enter your district or city"
+              value={formData.district}
+              onChange={(e) => updateFormData({ district: e.target.value })}
+              className="border-gray-300 focus:ring-blue-500 h-12 rounded-2xl"
+            />
+          </div>
+
+          <div className="space-y-3">
+            <div className="flex items-center gap-3">
+              <Checkbox
+                id="schoolEnrolled"
+                checked={formData.schoolEnrolled}
+                onCheckedChange={(checked) => updateFormData({ schoolEnrolled: checked })}
+                className="border-gray-300 h-5 w-5"
+              />
+              <Label htmlFor="schoolEnrolled" className="text-gray-700 cursor-pointer">
+                Child is enrolled in school/anganwadi
+              </Label>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <Checkbox
+                id="pregnancyStatus"
+                checked={formData.pregnancyStatus}
+                onCheckedChange={(checked) => updateFormData({ pregnancyStatus: checked })}
+                className="border-gray-300 h-5 w-5"
+              />
+              <Label htmlFor="pregnancyStatus" className="text-gray-700 cursor-pointer">
+                Family member is pregnant or lactating
+              </Label>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <Checkbox
+                id="nutritionConcerns"
+                checked={formData.nutritionConcerns}
+                onCheckedChange={(checked) => updateFormData({ nutritionConcerns: checked })}
+                className="border-gray-300 h-5 w-5"
+              />
+              <Label htmlFor="nutritionConcerns" className="text-gray-700 cursor-pointer">
+                Child has nutritional concerns or underweight
+              </Label>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <Checkbox
+                id="healthConcerns"
+                checked={formData.healthConcerns}
+                onCheckedChange={(checked) => updateFormData({ healthConcerns: checked })}
+                className="border-gray-300 h-5 w-5"
+              />
+              <Label htmlFor="healthConcerns" className="text-gray-700 cursor-pointer">
+                Child has health concerns or special needs
+              </Label>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-blue-50 p-4 rounded-2xl border border-blue-100 mt-4">
+          <p className="text-sm text-blue-800">
+            🔒 <strong>Privacy Notice:</strong> This information is used only to recommend relevant government schemes. No personal data is shared with external parties.
+          </p>
+        </div>
+      </div>
+    )}
+
+    <div className="bg-gradient-to-br from-green-50 to-blue-50 p-4 rounded-2xl border border-green-100">
+      <p className="text-sm text-green-800">
+        💡 <strong>Benefits:</strong> Access to nutrition programs, education schemes, healthcare benefits, scholarships, and early childhood development support programs.
+      </p>
+    </div>
+  </div>
+);
+
+const OfflineAccessStep = ({ formData, updateFormData }) => (
+  <div className="space-y-6">
+    <div className="bg-gradient-to-br from-orange-50 to-red-50 p-6 rounded-2xl border border-orange-100">
+      <div className="flex items-center gap-3 mb-3">
+        <div className="text-3xl">📶</div>
+        <div>
+          <h3 className="font-bold text-orange-900">Stay Connected Anywhere</h3>
+          <p className="text-orange-700 text-sm">Access Little Steps even with poor internet through SMS or voice calls</p>
+        </div>
+      </div>
+    </div>
+
+    <div className="flex items-start gap-4 p-4 bg-gradient-to-br from-sage-50 to-warm-50 rounded-2xl border border-sage-100">
+      <Checkbox
+        id="offlineAccess"
+        checked={formData.offlineAccess}
+        onCheckedChange={(checked) => updateFormData({ offlineAccess: checked })}
+        className="border-sage-300 h-5 w-5 mt-1"
+      />
+      <div className="flex-1">
+        <Label htmlFor="offlineAccess" className="text-sage-700 cursor-pointer font-medium block mb-2">
+          📱 Yes, set up offline access (recommended for rural areas)
+        </Label>
+        <p className="text-sm text-sage-600">
+          Get daily activities, progress updates, and government scheme alerts through SMS or voice calls even when internet is slow or unavailable.
+        </p>
+      </div>
+    </div>
+
+    {formData.offlineAccess && (
+      <div className="space-y-4 bg-white p-6 rounded-2xl border border-gray-200">
+        <h4 className="font-semibold text-gray-900 mb-4">🔧 Set up your offline access:</h4>
+        
+        <div className="grid gap-4">
+          <div>
+            <Label className="text-gray-700 font-medium mb-2 block">Phone Number</Label>
+            <Input
+              type="tel"
+              placeholder="+91 98765 43210"
+              value={formData.phoneNumber}
+              onChange={(e) => updateFormData({ phoneNumber: e.target.value })}
+              className="border-gray-300 focus:ring-orange-500 h-12 rounded-2xl"
+            />
+            <p className="text-xs text-gray-500 mt-1">SMS and voice calls will be sent to this number</p>
+          </div>
+
+          <div>
+            <Label className="text-gray-700 font-medium mb-2 block">Preferred Method</Label>
+            <Select onValueChange={(value) => updateFormData({ offlineMethod: value })}>
+              <SelectTrigger className="border-gray-300 focus:ring-orange-500 h-12 rounded-2xl">
+                <SelectValue placeholder="Choose your preferred method" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="SMS">📱 SMS Messages (₹0.10 per message)</SelectItem>
+                <SelectItem value="IVR">📞 Voice Calls (₹2-3 per minute)</SelectItem>
+                <SelectItem value="Both">🔄 Both SMS & Voice (recommended)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-3">
+            <Label className="text-gray-700 font-medium block">What would you like to receive?</Label>
+            
+            <div className="space-y-3">
+              <div className="flex items-center gap-3">
+                <Checkbox
+                  id="sms-daily"
+                  checked={formData.smsPreferences?.dailyActivity}
+                  onCheckedChange={(checked) => updateFormData({ 
+                    smsPreferences: { 
+                      ...formData.smsPreferences, 
+                      dailyActivity: checked 
+                    }
+                  })}
+                  className="border-gray-300 h-5 w-5"
+                />
+                <Label htmlFor="sms-daily" className="text-gray-700 cursor-pointer">
+                  📚 Daily activity recommendations (9 AM)
+                </Label>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <Checkbox
+                  id="sms-progress"
+                  checked={formData.smsPreferences?.weeklyProgress}
+                  onCheckedChange={(checked) => updateFormData({ 
+                    smsPreferences: { 
+                      ...formData.smsPreferences, 
+                      weeklyProgress: checked 
+                    }
+                  })}
+                  className="border-gray-300 h-5 w-5"
+                />
+                <Label htmlFor="sms-progress" className="text-gray-700 cursor-pointer">
+                  📊 Weekly progress summary (Sundays)
+                </Label>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <Checkbox
+                  id="sms-schemes"
+                  checked={formData.smsPreferences?.governmentSchemes}
+                  onCheckedChange={(checked) => updateFormData({ 
+                    smsPreferences: { 
+                      ...formData.smsPreferences, 
+                      governmentSchemes: checked 
+                    }
+                  })}
+                  className="border-gray-300 h-5 w-5"
+                />
+                <Label htmlFor="sms-schemes" className="text-gray-700 cursor-pointer">
+                  🏛️ Government scheme updates (as needed)
+                </Label>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <Checkbox
+                  id="sms-health"
+                  checked={formData.smsPreferences?.healthAlerts}
+                  onCheckedChange={(checked) => updateFormData({ 
+                    smsPreferences: { 
+                      ...formData.smsPreferences, 
+                      healthAlerts: checked 
+                    }
+                  })}
+                  className="border-gray-300 h-5 w-5"
+                />
+                <Label htmlFor="sms-health" className="text-gray-700 cursor-pointer">
+                  🏥 Health & development alerts (important only)
+                </Label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-orange-50 p-4 rounded-2xl border border-orange-100 mt-4">
+          <div className="text-sm text-orange-800 space-y-2">
+            <div className="flex items-center gap-2">
+              <span>💰</span>
+              <span><strong>Estimated Cost:</strong> ₹5-15 per month (depending on selections)</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span>🌍</span>
+              <span><strong>Languages:</strong> Hindi & English supported</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span>📞</span>
+              <span><strong>Support:</strong> 24/7 helpline available</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    )}
+
+    <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-4 rounded-2xl border border-blue-100">
+      <p className="text-sm text-blue-800">
+        🌟 <strong>Perfect for:</strong> Rural areas, limited data plans, unreliable internet, or parents who prefer text/voice updates over app notifications.
       </p>
     </div>
   </div>

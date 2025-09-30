@@ -12,14 +12,16 @@ function App() {
   const [childData, setChildData] = useState(null);
   const [isChatOpen, setIsChatOpen] = useState(false);
 
-  // Check if user has completed onboarding
+  // Always start fresh for prototype - clear any existing data
   useEffect(() => {
-    const savedData = localStorage.getItem('littleStepsChildData');
-    if (savedData) {
-      const parsedData = JSON.parse(savedData);
-      setChildData(parsedData);
-      setCurrentView('dashboard');
-    }
+    // Clear any existing localStorage data
+    localStorage.removeItem('littleStepsChildData');
+    
+    // Always start from onboarding
+    setCurrentView('onboarding');
+    setChildData(null);
+    
+    console.log('🔄 Prototype mode: Starting fresh from onboarding');
   }, []);
 
   const handleOnboardingComplete = (userData) => {

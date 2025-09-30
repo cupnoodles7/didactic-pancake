@@ -5,15 +5,23 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { 
   Star, Trophy, Target, Clock, Users, BookOpen, MessageCircle, 
-  Bell, Settings, Calendar, TrendingUp, Award, Heart 
+  Bell, Settings, Calendar, TrendingUp, Award, Heart, Brain, Shield, Radio 
 } from 'lucide-react';
 import AnimatedCharacter from './AnimatedCharacter';
 import ChatBot from './ChatBot';
+import LearningAssessment from './LearningAssessment';
+import CommunityDataStream from './CommunityDataStream';
+import GovernmentSchemes from './GovernmentSchemes';
+import OfflineAccessibility from './OfflineAccessibility';
 import { getRandomActivity } from './ActivityLibrary';
 
 const MobileDashboard = ({ childData, onStartActivity, onOpenChat }) => {
   const [characterAnimation, setCharacterAnimation] = useState('welcoming');
   const [showNotifications, setShowNotifications] = useState(false);
+  const [showLearningAssessment, setShowLearningAssessment] = useState(false);
+  const [showCommunityDataStream, setShowCommunityDataStream] = useState(false);
+  const [showGovernmentSchemes, setShowGovernmentSchemes] = useState(false);
+  const [showOfflineAccessibility, setShowOfflineAccessibility] = useState(false);
 
   const handleActivityStart = () => {
     setCharacterAnimation('encouraging');
@@ -251,7 +259,7 @@ const MobileDashboard = ({ childData, onStartActivity, onOpenChat }) => {
         </Card>
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-2 gap-3 pb-8">
+        <div className="grid grid-cols-2 gap-3 pb-4">
           <Button 
             variant="outline" 
             className="border-sage-300 text-sage-700 hover:bg-sage-50 hover:border-sage-400 rounded-2xl py-6 font-semibold min-h-[56px]"
@@ -263,10 +271,48 @@ const MobileDashboard = ({ childData, onStartActivity, onOpenChat }) => {
           <Button 
             variant="outline" 
             className="border-sage-300 text-sage-700 hover:bg-sage-50 hover:border-sage-400 rounded-2xl py-6 font-semibold min-h-[56px]"
-            onClick={() => {/* Navigate to community */}}
+            onClick={() => setShowCommunityDataStream(true)}
           >
             <Users className="h-4 w-4 mr-2" />
-            Community
+            Community Insights
+          </Button>
+        </div>
+
+        {/* AI Learning Assessment */}
+        <div className="pb-4">
+          <Button 
+            variant="outline" 
+            className="w-full border-purple-300 text-purple-700 hover:bg-purple-50 hover:border-purple-400 rounded-2xl py-6 font-semibold min-h-[56px] bg-gradient-to-r from-purple-50 to-indigo-50"
+            onClick={() => setShowLearningAssessment(true)}
+          >
+            <Brain className="h-5 w-5 mr-2" />
+            🧠 AI Learning Assessment
+          </Button>
+        </div>
+
+        {/* Government Schemes - Show only if user opted in */}
+        {childData.governmentSchemes && (
+          <div className="pb-4">
+            <Button 
+              variant="outline" 
+              className="w-full border-blue-300 text-blue-700 hover:bg-blue-50 hover:border-blue-400 rounded-2xl py-6 font-semibold min-h-[56px] bg-gradient-to-r from-blue-50 to-cyan-50"
+              onClick={() => setShowGovernmentSchemes(true)}
+            >
+              <Shield className="h-5 w-5 mr-2" />
+              🏛️ Government Schemes & Benefits
+            </Button>
+          </div>
+        )}
+
+        {/* Offline Accessibility */}
+        <div className="pb-8">
+          <Button 
+            variant="outline" 
+            className="w-full border-orange-300 text-orange-700 hover:bg-orange-50 hover:border-orange-400 rounded-2xl py-6 font-semibold min-h-[56px] bg-gradient-to-r from-orange-50 to-red-50"
+            onClick={() => setShowOfflineAccessibility(true)}
+          >
+            <Radio className="h-5 w-5 mr-2" />
+            📶 Offline Access (SMS/Voice)
           </Button>
         </div>
 
@@ -295,6 +341,57 @@ const MobileDashboard = ({ childData, onStartActivity, onOpenChat }) => {
             Close
           </Button>
         </div>
+      )}
+
+      {/* Learning Assessment Modal */}
+      {showLearningAssessment && (
+        <LearningAssessment 
+          childData={childData}
+          onClose={() => setShowLearningAssessment(false)}
+        />
+      )}
+
+      {/* Community Data Stream Modal */}
+      {showCommunityDataStream && (
+        <CommunityDataStream 
+          onClose={() => setShowCommunityDataStream(false)}
+        />
+      )}
+
+      {/* Government Schemes Modal */}
+      {showGovernmentSchemes && (
+        <GovernmentSchemes 
+          userProfile={{
+            parentName: childData.parentName,
+            childName: childData.childName,
+            childAge: childData.childAge * 12 + (childData.childAgeMonths || 0), // Convert to months
+            annualIncome: childData.annualIncome,
+            caste: childData.caste,
+            rationCardType: childData.rationCardType,
+            district: childData.district,
+            schoolEnrolled: childData.schoolEnrolled,
+            pregnancyStatus: childData.pregnancyStatus,
+            nutritionConcerns: childData.nutritionConcerns,
+            healthConcerns: childData.healthConcerns
+          }}
+          onClose={() => setShowGovernmentSchemes(false)}
+        />
+      )}
+
+      {/* Offline Accessibility Modal */}
+      {showOfflineAccessibility && (
+        <OfflineAccessibility 
+          userProfile={{
+            parentName: childData.parentName,
+            childName: childData.childName,
+            childAge: childData.childAge,
+            phoneNumber: childData.phoneNumber,
+            language: childData.language || 'english',
+            district: childData.district,
+            connectivity: childData.connectivity
+          }}
+          onClose={() => setShowOfflineAccessibility(false)}
+        />
       )}
     </div>
   );
